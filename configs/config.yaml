@@ -1,0 +1,87 @@
+ddp:
+  distributed: 
+  dist_backend: 
+  dist_url:
+  world_size: 1
+  gpu: 0
+  rank: 0
+
+dir: /gemini/data-2/CORE/checkpoints
+log_dir: /gemini/data-2/CORE/logs
+seed: 14
+model_name: "co2_net"
+valid_freq: 5
+save_ckpt: True
+save_ckpt_freq: 5
+clip_grad: None
+
+model: # model parameters (change accordingly for different models)
+  img_size:
+    - 90
+    - 120
+  patch_size:
+    - 9
+    - 12
+  in_chans: # number of input channels (variables)
+  out_chans: 1
+  all_frames: 8 # number of frames
+  tubelet_size: 2
+  depth: 12
+  down_ratio: 2
+  attn_drop_rate: 0.0
+  head_drop_rate: 0.0
+  init_scale: 0.001
+  drop_rate: 0.0
+  drop_path: 0.2
+
+optim:
+  epochs: 250
+  opt_betas:
+    - 0.9
+    - 0.999
+  lr: 5e-4
+  weight_decay: 8e-4
+  min_lr: 1e-6
+  warmup_lr: 1e-6
+  warmup_epochs: 0
+  warmup_steps: -1 # will overload warmup_epochs if set > 0
+  weight_decay_end: None
+
+data: &base_data
+  batch_size: 16
+  num_workers: 1
+  pin_mem: True
+  data_path: "/path/to/data"
+  resolution: 1
+  num_frames: 8
+  hrs: 3 # 采样间隔
+  image_size:
+    - 90
+    - 120
+  input_vars:
+    - "spots"
+    - "orography"
+    - "pressure"
+    - "gph"
+    - "specific_humidity"
+    - "temperature"
+    - "u"
+    - "v"
+  output_vars:
+    - "co2_net"
+
+train_data:
+  <<: *base_data
+  batch_size: 4
+  data_path: "/path/to/training/data"
+
+val_data:
+  <<: *base_data
+  batch_size: 16
+  data_path: "/path/to/validation/data"
+
+test_data:
+  <<: *base_data
+  batch_size: 16
+  data_path: "/path/to/testing/data"
+
